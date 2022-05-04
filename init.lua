@@ -66,8 +66,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'itchyny/lightline.vim'
 -- Treesitter for nvim
 Plug ('nvim-treesitter/nvim-treesitter', {['do'] = ':TSUpdate'})
---Quality of life (small plugins)
---
+-- Quality of life (small plugins)
 -- Git wrapper :Git or :G"
 Plug 'tpope/vim-fugitive'
 -- Surrounds selections (visual, iw, etc) with characters, or changes them"
@@ -80,18 +79,21 @@ Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-commentary'
 -- Asynchronous building (use Make instead of make)
 Plug 'tpope/vim-dispatch'
+-- Local vimrc .lvimrc
+Plug 'embear/vim-localvimrc'
+--
 -- Latex plugin
 Plug 'lervag/vimtex'
--- Neomake
--- Plug 'neomake/neomake'
 -- Cmake 
 Plug 'cdelledonne/vim-cmake'
+-- DAP
 -- DAP plugin
 Plug 'mfussenegger/nvim-dap'
 -- DAP UI
 Plug 'rcarriga/nvim-dap-ui'
 -- DAP Virtual Text
 Plug 'theHamsta/nvim-dap-virtual-text'
+--
 
 -- Initialize plugin system
 call("plug#end")
