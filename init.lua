@@ -102,9 +102,6 @@ Plug 'rcarriga/nvim-dap-ui'
 -- DAP Virtual Text
 Plug 'theHamsta/nvim-dap-virtual-text'
 --
---Arduino
-Plug 'stevearc/vim-arduino'
---
 
 -- Initialize plugin system
 call("plug#end")
