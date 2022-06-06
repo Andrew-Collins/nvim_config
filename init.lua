@@ -30,8 +30,13 @@ opt.ts = 4
 opt.sw = 4
 opt.sts = 4
 opt.et = true
+opt.smd = false
+opt.hidden = true
+opt.showtabline = 2
 opt.wmnu = true
-opt.wig:append('*.o,*.d')
+opt.mouse = 'a'
+opt.shell='zsh'
+opt.wig:append('*.o,*.d,*.obj')
 opt.path:append('**')
 --Variables
 g.mapleader = ';'
@@ -62,8 +67,8 @@ end
 Plug 'neovim/nvim-lspconfig'
 -- Nerdtree is a better netrw
 Plug 'scrooloose/nerdtree'
--- Lightline makes statusline look better
-Plug 'itchyny/lightline.vim'
+-- Lualine 
+Plug 'nvim-lualine/lualine.nvim'
 -- Treesitter for nvim
 Plug ('nvim-treesitter/nvim-treesitter', {['do'] = ':TSUpdate'})
 -- Quality of life (small plugins)
@@ -94,6 +99,9 @@ Plug 'rcarriga/nvim-dap-ui'
 -- DAP Virtual Text
 Plug 'theHamsta/nvim-dap-virtual-text'
 --
+--Arduino
+Plug 'stevearc/vim-arduino'
+--
 
 -- Initialize plugin system
 call("plug#end")
@@ -101,6 +109,55 @@ call("plug#end")
 --}}}
 
 -- Plugin Config{{{
+
+-- Lualine {{{
+require('lualine').setup {
+    options = {
+        icons_enabled = true,
+        theme = 'codedark',
+        component_separators = { left = '', right = ''},
+        section_separators = { left = '', right = ''},
+        disabled_filetypes = {},
+        always_divide_middle = true,
+        globalstatus = false,
+    },
+    sections = {
+        lualine_a = {'mode'},
+        lualine_b = {'branch', 'diff', 'diagnostics'},
+        lualine_c = {''},
+        lualine_x = {'encoding', 'fileformat', 'filetype'},
+        lualine_y = {'progress'},
+        lualine_z = {'location'}
+    },
+    inactive_sections = {
+        lualine_a = {},
+        lualine_b = {},
+        lualine_c = {'filename'},
+        lualine_x = {'location'},
+        lualine_y = {},
+        lualine_z = {}
+    },
+    tabline = {
+        lualine_a = {
+            {
+                'buffers',
+                mode = 2,
+                symbols = { 
+                    modified = ' ●',      -- Text to show when the buffer is modified
+                    alternate_file = '', -- Text to show to identify the alternate file
+                    directory =  '',     -- Text to show when the buffer is a directory
+                }
+            }
+        },
+        lualine_b = {'branch'},
+        lualine_c = {},
+        lualine_x = {},
+        lualine_y = {},
+        lualine_z = {'tabs'}
+    },
+    extensions = {}
+}
+-- }}}
 
 -- Treesitter{{{
 require'nvim-treesitter.configs'.setup { ensure_installed = {"c", "rust", "python", "lua", "vim"}, sync_install = false, ignore_install = {}, highlight = { enable = true, disable = {}, additional_vim_regex_highlighting = false, },
@@ -140,7 +197,7 @@ end
 -- Adapters{{{
 dap.adapters.python = {
   type = 'executable';
-  command = os.getenv( "HOME" )..'/.virtualenvs/debugpy/bin/python';
+  command = os.getenv( "HOME" )..'/.virtualenvs/debugpy/bin/python3';
   args = { '-m', 'debugpy.adapter' };
 }
 dap.adapters.cppdbg = {
