@@ -36,7 +36,7 @@ opt.showtabline = 2
 opt.wmnu = true
 opt.mouse = 'a'
 opt.shell='zsh'
-opt.wig:append('*.o,*.d,*.obj')
+opt.wig:append('*.o,*.d,*.obj,*.a,*.bin,*.elf,*.map,*.dir')
 opt.path:append('**')
 --Variables
 g.mapleader = ';'
@@ -45,6 +45,9 @@ g.vimtex_view_method = 'mupdf'
 --}}}
 
 --Key Mapping{{{
+-- General 
+keymap('n', '<Tab>', "<cmd>bn<CR>",{silent = true})
+keymap('n', '<S-Tab>', "<cmd>bp<CR>",{silent = true})
 --DAP
 keymap('n', '<leader>d', "<cmd>lua require'dap'.terminate()<CR> <cmd>lua require'dap'.continue()<CR>", {silent = true})
 keymap('n', '<leader>n', "<cmd>lua require'dap'.step_over()<CR>", {silent = true})
@@ -123,9 +126,9 @@ require('lualine').setup {
     },
     sections = {
         lualine_a = {'mode'},
-        lualine_b = {'branch', 'diff', 'diagnostics'},
+        lualine_b = {'branch', 'diff'},
         lualine_c = {''},
-        lualine_x = {'encoding', 'fileformat', 'filetype'},
+        lualine_x = {'encoding', 'filetype'},
         lualine_y = {'progress'},
         lualine_z = {'location'}
     },
