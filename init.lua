@@ -299,9 +299,50 @@ local on_attach = function(client, bufnr)
 
 end    
 
+-- Notably _not_ including `compile_commands.json`, as we want the entire project
+local root_pattern = nvim_lsp.util.root_pattern('.git')
+
+-- Might be cleaner to try to expose this as a pattern from `lspconfig.util`, as
+-- really it is just stolen from part of the `clangd` config
+local function project_name_to_container_name()
+    -- Turn the name of the current file into the name of an expected container, assuming that
+    -- the container running/building this file is named the same as the basename of the project
+    -- that the file is in
+    --
+    -- The name of the current buffer
+    local bufname = vim.api.nvim_buf_get_name(0)
+
+    -- Turned into a filename
+    local filename = nvim_lsp.util.path.is_absolute(bufname) and bufname or nvim_lsp.util.path.join(vim.loop.cwd(), bufname)
+
+    -- Then the directory of the project
+    local project_dirname = root_pattern(filename) or nvim_lsp.util.path.dirname(filename)
+
+    -- And finally perform what is essentially a `basename` on this directory
+    return vim.fn.fnamemodify(nvim_lsp.util.find_git_ancestor(project_dirname), ':t')
+end
+
+-- Note that via the `manager` from `server_per_root_dir_manager`, we'll get a separate instance
+-- of `clangd` as we switch between files, or even projects, inside of the right container
+--
+-- Finally, we've formed the "basename of a project" to pass to our `cclangd` script, which will
+-- then look for a matching container, or run `clangd` normally if no matching container is found
+--    /path/to/my/project
+-- would look for a container named `project`, and `docker exec` a `clangd` instance there, etc.
+nvim_lsp.clangd.setup{
+    cmd = {
+        'cclangd',
+        project_name_to_container_name(),
+    },
+	on_attach = on_attach,    
+	flags = {    
+	  debounce_text_changes = 150,    
+    }
+}
+
 -- Use a loop to conveniently call 'setup' on multiple servers and    
 -- map buffer local keybindings when the language server attaches    
-local servers = {'cmake', 'pyright', 'clangd'}    
+local servers = {'cmake', 'pyright'}    
 for _, lsp in ipairs(servers) do    
   nvim_lsp[lsp].setup {    
 	on_attach = on_attach,    
