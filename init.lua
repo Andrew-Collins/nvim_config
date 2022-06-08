@@ -18,6 +18,9 @@ else
     -- If linux then vim-plug is already on path 
     -- Set the clipboard to be unamedplus
     fn.set("clipboard=unnamedplus")
+    if (fn.has("termguicolors")) then
+        fn.set("termguicolors")
+    end
     call('plug#begin', vim.fn.stdpath('data')..'/plugged')
     -- Helper functions for unix  
     Plug 'tpope/vim-eunuch'
@@ -35,7 +38,6 @@ opt.hidden = true
 opt.showtabline = 2
 opt.wmnu = true
 opt.mouse = 'a'
-opt.shell='zsh'
 opt.wig:append('*.o,*.d,*.obj,*.a,*.bin,*.elf,*.map,*.dir')
 opt.path:append('**')
 --Variables
@@ -89,6 +91,8 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dispatch'
 -- Local vimrc .lvimrc
 Plug 'embear/vim-localvimrc'
+-- Nvim Distant
+Plug 'chipsenkbeil/distant.nvim'
 --
 -- Latex plugin
 Plug 'lervag/vimtex'
@@ -102,6 +106,7 @@ Plug 'rcarriga/nvim-dap-ui'
 -- DAP Virtual Text
 Plug 'theHamsta/nvim-dap-virtual-text'
 --
+Plug 'sainnhe/edge'
 
 -- Initialize plugin system
 call("plug#end")
@@ -110,11 +115,20 @@ call("plug#end")
 
 -- Plugin Config{{{
 
+-- Colour Theme{{{
+g.edge_style = 'aura'
+g.edge_better_performance = 1
+g.edge_transparent_background = 1
+g.edge_dim_foreground = 1
+cmd("colorscheme edge")
+
+--}}}
+
 -- Lualine {{{
 require('lualine').setup {
     options = {
         icons_enabled = true,
-        theme = 'codedark',
+        theme = 'edge',
         component_separators = { left = '', right = ''},
         section_separators = { left = '', right = ''},
         disabled_filetypes = {},
@@ -149,7 +163,7 @@ require('lualine').setup {
                 }
             }
         },
-        lualine_b = {'branch'},
+        lualine_b = {},
         lualine_c = {},
         lualine_x = {},
         lualine_y = {},
@@ -157,6 +171,10 @@ require('lualine').setup {
     },
     extensions = {}
 }
+-- }}}
+
+-- Distant {{{
+require'distant'.setup { ['*'] = require('distant.settings').chip_default() }
 -- }}}
 
 -- Treesitter{{{
