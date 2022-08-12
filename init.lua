@@ -46,6 +46,16 @@ g.maplocalleader = ','
 g.vimtex_view_method = 'mupdf'
 --}}}
 
+-- Misc {{{
+-- Remove buffers from buffer list
+cmd [[
+augroup qf
+    autocmd!
+    autocmd FileType qf set nobuflisted
+augroup END
+]]
+-- }}}
+
 --Key Mapping{{{
 -- General 
 keymap('n', '<Tab>', "<cmd>bn<CR>",{silent = true})
@@ -89,6 +99,8 @@ Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-commentary'
 -- Asynchronous building (use Make instead of make)
 Plug 'tpope/vim-dispatch'
+-- Session saving
+Plug 'tpope/vim-obsession'
 -- Local vimrc .lvimrc
 Plug 'embear/vim-localvimrc'
 -- Nvim Distant
