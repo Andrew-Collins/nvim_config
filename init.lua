@@ -46,6 +46,16 @@ g.maplocalleader = ','
 g.vimtex_view_method = 'mupdf'
 --}}}
 
+-- Misc {{{ 
+-- Remove buffers from buffer list
+cmd [[
+augroup qf 
+    autocmd!
+    autocmd FileType qf set nobuflisted
+augroup END
+]]
+-- }}}
+
 --Key Mapping{{{
 -- General 
 keymap('n', '<Tab>', "<cmd>bn<CR>",{silent = true})
@@ -84,6 +94,8 @@ Plug ('nvim-treesitter/nvim-treesitter', {['do'] = ':TSUpdate'})
 Plug 'tpope/vim-fugitive'
 -- Surrounds selections (visual, iw, etc) with characters, or changes them"
 Plug 'tpope/vim-surround'
+-- Sessions
+Plug 'tpope/vim-obsession'
 -- Allows for plugins such as vim-surround to use ."
 Plug 'tpope/vim-repeat'
 -- Sets default behaviour to be more sensible"
