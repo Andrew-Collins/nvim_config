@@ -52,6 +52,7 @@ keymap('n', '<Tab>', "<cmd>bn<CR>",{silent = true})
 keymap('n', '<S-Tab>', "<cmd>bp<CR>",{silent = true})
 --DAP
 keymap('n', '<leader>d', "<cmd>lua require'dap'.terminate()<CR> <cmd>lua require'dap'.continue()<CR>", {silent = true})
+keymap('n', '<leader>c', "<cmd>lua require'dap'.continue()<CR>", {silent = true})
 keymap('n', '<leader>n', "<cmd>lua require'dap'.step_over()<CR>", {silent = true})
 keymap('n', '<leader>si', "<cmd>lua require'dap'.step_into()<CR>", {silent = true})
 keymap('n', '<leader>so', "<cmd>lua require'dap'.step_out()<CR>", {silent = true})
@@ -68,6 +69,8 @@ end
 --}}}
 
 -- Plugins{{{
+Plug 'williamboman/mason.nvim'
+Plug 'williamboman/mason-lspconfig.nvim'
 -- LSP configurations using nvim builtin lsp
 Plug 'neovim/nvim-lspconfig'
 -- Nerdtree is a better netrw
@@ -215,7 +218,7 @@ end
 -- Adapters{{{
 dap.adapters.python = {
   type = 'executable';
-  command = os.getenv( "HOME" )..'/.virtualenvs/debugpy/bin/python3';
+  command = os.getenv( "HOME" )..'/.local/share/nvim/mason/packages/debugpy/venv/bin/python3';
   args = { '-m', 'debugpy.adapter' };
 }
 dap.adapters.cppdbg = {
@@ -311,4 +314,15 @@ for _, lsp in ipairs(servers) do
   }    
 end    
 --}}}
+
+-- Mason {{{
+require("mason").setup{
+    log_level = vim.log.levels.DEBUG
+}
+require("mason-lspconfig").setup({
+    ensure_installed = {"cmake", "pyright", "clangd"},
+    -- automatic_installation = true,
+})
+
+-- }}}
 --}}}
