@@ -316,7 +316,7 @@ end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and    
 -- map buffer local keybindings when the language server attaches    
-local servers = {'cmake', 'pyright', 'clangd'}    
+local servers = {'cmake', 'pyright', 'clangd', 'rust_analyzer'}    
 for _, lsp in ipairs(servers) do    
   nvim_lsp[lsp].setup {    
 	on_attach = on_attach,    
@@ -332,7 +332,7 @@ require("mason").setup{
     log_level = vim.log.levels.DEBUG
 }
 require("mason-lspconfig").setup({
-    ensure_installed = {"cmake", "pyright", "clangd"},
+    ensure_installed = {"cmake", "pyright", "clangd", "rust_analyzer"},
     -- automatic_installation = true,
 })
 
