@@ -79,12 +79,16 @@ end
 --}}}
 
 -- Plugins{{{
+-- Plenary 
+Plug 'nvim-lua/plenary.nvim'
+-- Mason
 Plug 'williamboman/mason.nvim'
 Plug 'williamboman/mason-lspconfig.nvim'
 -- LSP configurations using nvim builtin lsp
 Plug 'neovim/nvim-lspconfig'
--- Nerdtree is a better netrw
-Plug 'scrooloose/nerdtree'
+-- Ranger integration
+Plug 'francoiscabrol/ranger.vim'
+Plug 'rbgrouleff/bclose.vim'
 -- Lualine 
 Plug 'nvim-lualine/lualine.nvim'
 -- Treesitter for nvim
@@ -106,8 +110,6 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dispatch'
 -- Local vimrc .lvimrc
 Plug 'embear/vim-localvimrc'
--- Nvim Distant
-Plug 'chipsenkbeil/distant.nvim'
 --
 -- Latex plugin
 Plug 'lervag/vimtex'
@@ -120,7 +122,10 @@ Plug 'mfussenegger/nvim-dap'
 Plug 'rcarriga/nvim-dap-ui'
 -- DAP Virtual Text
 Plug 'theHamsta/nvim-dap-virtual-text'
---
+-- Rust Helper
+Plug 'simrat39/rust-tools.nvim'
+-- 
+-- Themes
 Plug 'sainnhe/edge'
 
 -- Initialize plugin system
@@ -146,7 +151,8 @@ require('lualine').setup {
         theme = 'edge',
         component_separators = { left = '', right = ''},
         section_separators = { left = '', right = ''},
-        disabled_filetypes = {},
+        disabled_filetypes = {'qf' },
+        ignore_focus = {'qf' },
         always_divide_middle = true,
         globalstatus = false,
     },
@@ -184,17 +190,37 @@ require('lualine').setup {
         lualine_y = {},
         lualine_z = {'tabs'}
     },
-    extensions = {}
+    winbar = {
+      lualine_a = {},
+      lualine_b = {},
+      lualine_c = {'filename'},
+      lualine_x = {},
+      lualine_y = {},
+      lualine_z = {}
+    },
+    inactive_winbar = {
+      lualine_a = {},
+      lualine_b = {},
+      lualine_c = {'filename'},
+      lualine_x = {},
+      lualine_y = {},
+      lualine_z = {}
+    },
+    extensions = { }
 }
 -- }}}
 
 -- Distant {{{
-require'distant'.setup { ['*'] = require('distant.settings').chip_default() }
+-- require'distant'.setup { ['*'] = require('distant.settings').chip_default() }
 -- }}}
 
 -- Treesitter{{{
 require'nvim-treesitter.configs'.setup { ensure_installed = {"c", "rust", "python", "lua", "vim"}, sync_install = false, ignore_install = {}, highlight = { enable = true, disable = {}, additional_vim_regex_highlighting = false, },
 }
+--}}}
+
+-- Ranger {{{
+g.ranger_replace_netrw = 1
 --}}}
  
 -- DAP{{{
@@ -236,12 +262,18 @@ dap.adapters.python = {
 dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',
-  command = '/home/ac/.vscode/extension/debugAdapters/bin/OpenDebugAD7',
+  command = os.getenv( "HOME" )..'/.local/share/nvim/mason/bin/OpenDebugAD7', -- adjust as needed
 }
-dap.adapters.lldb = {
-  type = 'executable',
-  command = '/usr/bin/lldb-vscode', -- adjust as needed
-  name = "lldb"
+
+local extension_path = os.getenv( "HOME" )..'/.local/share/nvim/mason/packages/codelldb/extension/'
+local codelldb_path = extension_path .. 'adapter/codelldb'
+dap.adapters.codelldb = {
+    type = 'server',
+    port = "${port}",
+    executable = {
+        command = codelldb_path,
+        args = {"--port", "${port}"},
+    },
 }
 --}}}
 -- Configurations{{{
@@ -257,7 +289,7 @@ dap.configurations.python = {
 dap.configurations.cpp = {
   {
     name = "Default",
-    type = "lldb",
+    type = "cppdbg",
     request = "launch",
     program = function()
       return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
@@ -271,15 +303,34 @@ dap.configurations.cpp = {
 dap.configurations.rust = {
     {
         name = "Default",
-        type = "cppdbg",
+        type = "codelldb",
         request = "launch",
         program = function()
           return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
         end,
         cwd = '${workspaceFolder}',
+        stopOnEntry = false,
     },
 }
 --}}}
+-- Other {{{ 
+local rt = require("rust-tools")
+local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
+rt.setup({
+    server = {
+        on_attach = function(_, bufnr)
+          -- Hover actions
+          vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+          -- Code action groups
+          vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+        end,
+    },
+    dap = {
+        adapter = require('rust-tools.dap').get_codelldb_adapter(
+            codelldb_path, liblldb_path)
+    },
+})
+-- }}}
 require('dap.ext.vscode').load_launchjs()
 --}}}
 
@@ -316,7 +367,7 @@ end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and    
 -- map buffer local keybindings when the language server attaches    
-local servers = {'cmake', 'pyright', 'clangd', 'rust_analyzer'}    
+local servers = {'cmake', 'pyright', 'clangd'}    
 for _, lsp in ipairs(servers) do    
   nvim_lsp[lsp].setup {    
 	on_attach = on_attach,    
